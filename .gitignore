@@ -1,0 +1,4 @@
+config.py
+kafkaConfig.ini
+venv/
+__pycache__/
