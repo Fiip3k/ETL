@@ -1,6 +1,6 @@
 #!source venv/bin/activate
 import os
-from config import azureConfig
+from config import AzureConfig
 from azure.storage.filedatalake import DataLakeServiceClient
 
 def initialize_storage_account_ad(storage_account_name, storage_account_key):
@@ -43,7 +43,7 @@ def upload_file_to_directory(path: str, directory: str, serverFileName: str = No
 if __name__ == "__main__":
 
     storage_account_name = 'fiip3kdatalake'
-    storage_account_key = azureConfig["key"]
+    storage_account_key = AzureConfig["key"]
     
     initialize_storage_account_ad(storage_account_name, storage_account_key)
     result = upload_file_to_directory("test.csv", "test")
