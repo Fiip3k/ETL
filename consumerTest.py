@@ -1,16 +1,27 @@
 #!source venv/bin/activate
+from config import ConsumerConfig
 from configparser import ConfigParser
 from confluent_kafka import Consumer
 
+def loadConfig(filename: str = None):
+    if not filename:
+        config = ConsumerConfig
+    else:
+        config = ConfigParser()
+        config_file = open(filename, "r")
+        config.read_file(config_file)
+        config = dict(config["Kafka"])
+    return config
+
+def loadConsumer(filename: str = None):
+    config = loadConfig(filename)
+    consumer = Consumer(config)
+    return consumer
+
+
 def main():
 
-    config = ConfigParser()
-    config_file = open("kafkaConfig.ini", "r")
-    config.read_file(config_file)
-    config = dict(config["Kafka"])
-
-    consumer = Consumer(config)
-    
+    consumer = loadConsumer()
     topic = "wgcpspem-test"
 
 
