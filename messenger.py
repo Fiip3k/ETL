@@ -1,6 +1,5 @@
-#!source venv/bin/activate
 import threading
-
+import json
 from confluent_kafka import Producer, Consumer, KafkaException
 from config import ProducerConfig, ConsumerConfig
 from threading import Thread
@@ -16,8 +15,9 @@ class Messenger:
         self.consumer = Messenger.loadConsumer()
         
 
-    def sendMessage(self, topic: str, message: str) -> None:
-        self.producer.produce(topic, value=message)
+    def sendMessage(self, topic: str, message: dict) -> None:
+        jsonData = json.dumps(message)
+        self.producer.produce(topic, value=jsonData.encode('utf-8'))
         self.producer.flush()
 
     @staticmethod
@@ -45,12 +45,13 @@ class Messenger:
                         print("Consumer error: {}".format(msg.error()))
                         continue
                     if handler != None:
-                        handler(msg.value().decode("utf-8"))
+                        handler(json.loads(msg.value().decode("utf-8")))
                     else:
-                        print("Received message: {}".format(msg.value().decode("utf-8")))
+                        print("Received message: {}".format(json.loads(msg.value().decode("utf-8"))))
             except KafkaException as e:
                 print("KafkaException: {}".format(e))
                 return
+            self.consumer.close()
 
         thread = Thread(target=runConsumer, daemon=None)
         thread.start()

@@ -1,4 +1,3 @@
-#!source venv/bin/activate
 import os
 from config import AzureConfig
 from azure.storage.filedatalake import DataLakeServiceClient
@@ -35,6 +34,7 @@ class LakeClient:
             with open(filePath,'r') as localFile:
                 fileContents = localFile.read()
                 fileClient.upload_data(fileContents, overwrite=overwrite)
+            print("File uploaded successfully.")
         except Exception as e:
             print(e)
             return -1

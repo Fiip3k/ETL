@@ -1,7 +1,11 @@
+#!source venv/bin/activate
+
+import time
 from messenger import Messenger
 from lakeClient import LakeClient
 from datetime import datetime
-import time
+from threading import Thread
+
 
 class NewDataHandler:
 
@@ -10,20 +14,21 @@ class NewDataHandler:
     def __init__(self) -> None:
         self.lakeClient = LakeClient("fiip3kdatalake")
 
-
-
-    def messageReceived(self, msg: str):
+    def messageReceived(self, msg: dict):
         def processMessage():
-            pass
-        # TODO
+            if(msg["message"]=="upload"):
+                result = self.lakeClient.uploadFile(msg['filename'], msg["path"], overwrite=msg["overwrite"])
+            elif(msg["message"]=="download"):
+                result = self.lakeClient.downloadFile(msg['path'], msg['filename'], msg['saveas'])
+            else:
+                print(msg)
+                time.sleep(10)
 
-        print(msg)
+        thread = Thread(target=processMessage, daemon=False)
+        thread.start()
 
 def main():
     ndh = NewDataHandler()
-    lakeClient = LakeClient("fiip3kdatalake")
-    #lakeClient.uploadFile("test.csv", "newdata/test")
-    #file = lakeClient.downloadFile("newdata/test/", "test.csv", "downloadedTest.csv")
     msgr = Messenger()
     thread, exitEvent = msgr.startListening("wgcpspem-test", handler=ndh.messageReceived, daemon = None)
     print("Listener started...")
@@ -31,13 +36,15 @@ def main():
     time.sleep(5)
     current_datetime = datetime.now()
     formatted_datetime = current_datetime.strftime("%H:%M:%S %d.%m.%Y")
-    msgr.sendMessage("wgcpspem-test", "MESSAGEU " + formatted_datetime)
-    msgr.sendMessage("wgcpspem-test", "MESSAGEU " + formatted_datetime)
-    msgr.sendMessage("wgcpspem-test", "MESSAGEU " + formatted_datetime)
+
+    filename = "test.csv"
+
+    msgr.sendMessage("wgcpspem-test", {"message":"upload", "path":"newdata/test", "filename":filename, "overwrite":True, "datetime":formatted_datetime})
+    time.sleep(5)
+    msgr.sendMessage("wgcpspem-test", {"message":"download", "path":"newdata/test", "filename":filename, "saveas":"downloadedTest.csv", "datetime":formatted_datetime})
     print("Messages sent...")
 
-    while input() != "EXIT":
-        pass
+    input()
     exitEvent.set()
     thread.join()
     print("Listener finished.")
