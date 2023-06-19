@@ -42,10 +42,24 @@ class NewDataHandler:
                 result = self.lakeClient.uploadFile(
                     msg["filename"], msg["path"], overwrite=msg["overwrite"]
                 )
+                if result == 0:
+                    current_datetime = datetime.now()
+                    formatted_datetime = current_datetime.strftime("%H:%M:%S %d.%m.%Y")
+                    self.msgr.sendMessage(
+                        "wgcpspem-newdata",
+                        {
+                            "message": "New data arrived.",
+                            "path": msg["path"],
+                            "filename": msg["filename"],
+                            "datetime": formatted_datetime,
+                        },
+                    )
+
             elif msg["message"] == "download":
                 result = self.lakeClient.downloadFile(
                     msg["path"], msg["filename"], msg["saveas"]
                 )
+
             else:
                 print(msg)
 

@@ -1,32 +1,34 @@
-#!source venv/bin/activate
-#!call venv/bin/activate
-
 import time
 from newDataHandler import NewDataHandler
 
 
 def main():
     ndh = NewDataHandler()
+
+    topic = "wgcpspem-upload"
+
     thread, exitEvent = ndh.msgr.startListening(
-        "wgcpspem-test", handler=ndh.startMessageProcessor
+        topic, handler=ndh.startMessageProcessor
     )
     print("Listener started...")
     ndh.periodicCleanUp(10)
 
     time.sleep(3)
-
-    topic = "wgcpspem-test"
     filename = "test.csv"
-    ndh.sendUploadMessage(topic, filename, "newdata/test", overwrite=False)
+    ndh.sendUploadMessage(topic, filename, "newdata/test", overwrite=True)
+    print("Upload message sent...")
 
     time.sleep(3)
-
     ndh.sendDownloadMessage(topic, "newdata/test", filename, "downloadedTest.csv")
-    print("Messages sent...")
+    print("Download message sent...")
 
-    input()
+    # Input() for standard cases
+    # input()
+
+    # Sleep instead of input() for testing purposes
+    time.sleep(3)
+
     exitEvent.set()
-
     thread.join()
     ndh.join()
     ndh.stopPeriodicCleanUp()
