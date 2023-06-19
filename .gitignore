@@ -1,4 +1,6 @@
 config.py
-kafkaConfig.ini
 venv/
 __pycache__/
+test.csv
+downloadedTest.csv
+.vscode
