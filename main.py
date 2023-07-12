@@ -16,7 +16,18 @@ def main():
     time.sleep(3)
 
     topic = "wgcpspem-test"
+
     filename = "test.csv"
+    ndh.sendUploadMessage(topic, filename, "newdata/test", overwrite=False)
+
+    time.sleep(3)
+
+    filename = "tran_hv_pstra.tsv"
+    ndh.sendUploadMessage(topic, filename, "newdata/test", overwrite=False)
+
+    time.sleep(3)
+
+    filename = "urb_percep.tsv"
     ndh.sendUploadMessage(topic, filename, "newdata/test", overwrite=False)
 
     time.sleep(3)
@@ -24,7 +35,7 @@ def main():
     ndh.sendDownloadMessage(topic, "newdata/test", filename, "downloadedTest.csv")
     print("Messages sent...")
 
-    input()
+    # input()
     exitEvent.set()
 
     thread.join()
